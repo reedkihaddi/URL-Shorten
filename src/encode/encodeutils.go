@@ -1,4 +1,4 @@
-package base62
+package encode
 
 import (
 	"crypto/sha256"

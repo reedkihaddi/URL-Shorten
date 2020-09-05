@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"net/url"
 	"time"
-	"urlshorten/src/base62"
+	"urlshorten/src/encode"
 	"urlshorten/src/models"
 	"github.com/gorilla/mux"
 )
@@ -86,7 +86,7 @@ func (driver *DBClient) GenerateShortURL(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	hashID := base62.HashLink(url)
+	hashID := encode.HashLink(url)
 	err = driver.db.QueryRow("INSERT INTO web_url(id,url) VALUES($1,$2) RETURNING id", hashID, url).Scan(&res)
 	
 	if err != nil {
