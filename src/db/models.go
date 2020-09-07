@@ -12,7 +12,7 @@ const (
 	host     = "localhost"
 	port     = 5432
 	user     = "saurabh"
-	password = "helloplsthisnotreal"
+	password = "therock01"
 	dbname   = "mydb"
 )
 

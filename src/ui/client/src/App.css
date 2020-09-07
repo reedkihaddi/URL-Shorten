@@ -1,0 +1,16 @@
+
+
+.GitHub{
+    transform: scale(1.25) !important;
+    color: black
+  }
+
+
+.underline-continued{
+    background-image: linear-gradient(120deg,orange 0%, orange 100%);
+    background-repeat: no-repeat;
+    background-size: 100% 0.3em;
+    background-position: 0 88%;
+    transition: background-size 0.25s 
+}
+

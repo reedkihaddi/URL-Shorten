@@ -2,14 +2,14 @@ package main
 
 import (
 	"database/sql"
-	"fmt"
+	"encoding/json"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
-	"time"
+	models "urlshorten/src/db"
 	"urlshorten/src/encode"
-	"urlshorten/src/models"
+
 	"github.com/gorilla/mux"
 )
 
@@ -33,15 +33,18 @@ func main() {
 	r := mux.NewRouter()
 	r.HandleFunc("/", dbclient.GenerateShortURL).Methods("POST")
 	r.HandleFunc("/{encoded_string:[a-zA-Z0-9]*}", dbclient.GetOriginalURL).Methods("GET")
-	r.HandleFunc("/", greet).Methods("GET")
-
+	//fileServer := http.FileServer(http.Dir("./ui/client/public/"))
+	//r.Handle("/", http.StripPrefix("/", fileServer))
+	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		log.Printf("%s %s %s\n", r.RemoteAddr, r.Method, r.URL)
+	})
 	http.ListenAndServe(":8080", r)
 
 }
 
 // Check if the URL is valid or not.
 func isValidURL(toTest string) error {
-	
+
 	_, err := url.ParseRequestURI(toTest)
 	if err != nil {
 		return err
@@ -62,6 +65,7 @@ type DBClient struct {
 
 //GetOriginalURL searches the encoded URL and redirects to original URL.
 func (driver *DBClient) GetOriginalURL(w http.ResponseWriter, r *http.Request) {
+
 	var res string
 	vars := mux.Vars(r)
 	err := driver.db.QueryRow("SELECT url FROM web_url WHERE id = $1", vars["encoded_string"]).Scan(&res)
@@ -70,6 +74,7 @@ func (driver *DBClient) GetOriginalURL(w http.ResponseWriter, r *http.Request) {
 	} else {
 		http.Redirect(w, r, res, 301)
 	}
+	log.Printf("Getting URL: %s %s %s\n", r.RemoteAddr, r.Method, r.URL)
 }
 
 //GenerateShortURL generates the encoded URL to use.
@@ -87,16 +92,19 @@ func (driver *DBClient) GenerateShortURL(w http.ResponseWriter, r *http.Request)
 	}
 
 	hashID := encode.HashLink(url)
+	responseMap := map[string]interface{}{"encoded_string": "http://localhost:8080/" + hashID}
 	err = driver.db.QueryRow("INSERT INTO web_url(id,url) VALUES($1,$2) RETURNING id", hashID, url).Scan(&res)
-	
+
 	if err != nil {
 		log.Println(err)
 		log.Println("Couldn't insert into the database.")
 	} else {
-		w.Write([]byte(r.Host + r.URL.Path + res))
-	}
-}
+		w.Header().Set("Content-Type", "application/json")
+		response, _ := json.Marshal(responseMap)
+		w.Write(response)
 
-func greet(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Hello World! %s", time.Now())
+	}
+
+	log.Printf("Generating URL: %s %s %s\n", r.RemoteAddr, r.Method, r.URL)
+
 }
