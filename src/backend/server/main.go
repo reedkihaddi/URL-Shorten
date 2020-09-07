@@ -7,8 +7,8 @@ import (
 	"log"
 	"net/http"
 	"net/url"
-	models "urlshorten/src/db"
-	"urlshorten/src/encode"
+	models "urlshorten/src/backend/db"
+	"urlshorten/src/backend/encode"
 
 	"github.com/gorilla/mux"
 )

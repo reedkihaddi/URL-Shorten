@@ -1,36 +1,36 @@
-import React, { useState, useRef } from "react";
+import React, { useState} from "react";
 import { makeStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import Grid from '@material-ui/core/Grid';
-import Button from '@material-ui/core/Button';
-import IconButton from '@material-ui/core/IconButton';
-import MenuIcon from '@material-ui/icons/Menu';
 import 'fontsource-roboto';
 import GitHubIcon from '@material-ui/icons/GitHub';
-import styles from './App.css';
 import SearchBar from "material-ui-search-bar";
-import { Alert, AlertTitle } from '@material-ui/lab';
-import ArrowRightAltIcon from '@material-ui/icons/ArrowRightAlt';
+import { Alert } from '@material-ui/lab';
 import LinkIcon from '@material-ui/icons/Link';
 import 'is-url'
-import isUrl from "is-url";
 import Typewriter from 'typewriter-effect';
 
 
-
 function App() {
+  // States for the website
   const [url, setUrl] = useState("");
   const [showResults, setShowResults] = useState(false);
   const [showError, setShowError] = useState(false);
   const [value, setValue] = useState("")
 
+  // On submit of link
   const handleSubmit = (evt) => {
+    
+    // Check if valid URL
     let check = isValidURL({ value })
-    console.log(check)
-    if (check == true) {
+
+    // If true, show generated link else invalid info
+    if (check === true) {
+
       let val = returnStr({ value })
+      
       fetch('/', {
         method: 'post',
         body: val,
@@ -45,7 +45,10 @@ function App() {
           console.log(error)
         });
     }
-    setShowError(true)
+
+    if (check===false){
+      setShowError(true)
+    }
     setShowResults(false)
 
   }
@@ -91,8 +94,10 @@ function App() {
     },
 
   }));
+
   const classes = useStyles();
 
+  // Code snipped for showing link
   const Results = () => (
     <div id="results" className={classes.Alert}>
       <Grid container justify="center">
@@ -105,6 +110,8 @@ function App() {
       </Grid>
     </div>
   )
+
+  // Code snipped for error
   const ErrorCode = () => (
     <div id="results" className={classes.Alert}>
       <Grid container justify="center">
@@ -138,8 +145,6 @@ function App() {
   }}
 />
       </Typography>
-      
-
       <div className={classes.SearchBar}>
         <SearchBar
           placeholder="Enter a URL"
